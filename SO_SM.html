@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title> Script de Monitoreo</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* Usar una fuente más moderna y legible */
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        /* Estilos para los bloques de código */
+        pre {
+            background-color: #1f2937; /* gray-800 */
+            color: #f3f4f6; /* gray-100 */
+            padding: 1rem;
+            border-radius: 0.5rem;
+            overflow-x: auto;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+        /* Estilos para el código en línea */
+        .inline-code {
+            background-color: #e5e7eb; /* gray-200 */
+            color: #1f2937; /* gray-800 */
+            padding: 0.125rem 0.3rem;
+            border-radius: 0.25rem;
+            font-size: 0.9em;
+            font-family: 'Courier New', Courier, monospace;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800">
+    <div class="container mx-auto p-4 sm:p-6 md:p-8">
+        <!-- Encabezado -->
+        <header class="text-center mb-10">
+            <h1 class="text-3xl md:text-4xl font-bold text-gray-900">Script de Monitoreo</h1>
+        </header>
+
+        <!-- Contenido Principal -->
+        <main class="space-y-12">
+
+            <!-- Parte 1: Inicio y Ejecución en Segundo Plano -->
+            <section class="bg-white p-6 rounded-lg shadow-lg">
+                <h2 class="text-2xl font-semibold text-gray-800 border-b-2 border-gray-200 pb-3 mb-4">Parte 1: Inicio y Ejecución en Segundo Plano</h2>
+                <pre><code>@echo off
+setlocal EnableExtensions EnableDelayedExpansion
+
+if /i "%~1" NEQ ":RUN" (
+  start "" /min cmd /k "%~f0" :RUN
+  exit /b
+)
+
+:RUN
+title Monitor de PROCESOS (solo) - No cerrar</code></pre>
+                <div class="mt-4 space-y-4">
+                    <div>
+                        <h3 class="text-xl font-medium text-gray-700">Lógica</h3>
+                        <p class="mt-1">Esta sección está diseñada para que el script se inicie a sí mismo en una nueva ventana de consola minimizada, permitiendo que se ejecute en segundo plano sin estorbar.</p>
+                    </div>
+                    <div>
+                        <h3 class="text-xl font-medium text-gray-700">Paso a paso</h3>
+                        <ol class="list-decimal list-inside space-y-2 mt-2 text-gray-700">
+                            <li>Al hacer doble clic, el script se ejecuta sin argumentos (<code class="inline-code">%~1</code> está vacío).</li>
+                            <li>La condición <code class="inline-code">if</code> es verdadera, por lo que ejecuta el comando <code class="inline-code">start</code>.</li>
+                            <li>El comando <code class="inline-code">start</code> abre una nueva ventana minimizada (<code class="inline-code">/min</code>) y vuelve a ejecutar este mismo script (<code class="inline-code">%~f0</code>), pero pasándole el argumento <code class="inline-code">:RUN</code>.</li>
+                            <li>La ventana original se cierra (<code class="inline-code">exit /b</code>).</li>
+                            <li>En la nueva ventana, el script tiene el argumento <code class="inline-code">:RUN</code>, la condición <code class="inline-code">if</code> es falsa, y la ejecución continúa desde la etiqueta <code class="inline-code">:RUN</code>.</li>
+                        </ol>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Parte 2: Configuración de Parámetros y Variables -->
+            <section class="bg-white p-6 rounded-lg shadow-lg">
+                <h2 class="text-2xl font-semibold text-gray-800 border-b-2 border-gray-200 pb-3 mb-4">Parte 2: Configuración de Parámetros y Variables</h2>
+                <h3 class="text-xl font-medium text-gray-700">Lógica</h3>
+                <p class="mt-1">Centralizar todas las variables de configuración en un solo lugar para que sea fácil modificar el comportamiento del script (como la contraseña de la base de datos, el tiempo de espera, etc.) sin tener que buscar en todo el código.</p>
+            </section>
+
+            <!-- Parte 3: El Bucle Principal y la Verificación de Conexión -->
+            <section class="bg-white p-6 rounded-lg shadow-lg">
+                <h2 class="text-2xl font-semibold text-gray-800 border-b-2 border-gray-200 pb-3 mb-4">Parte 3: El Bucle Principal y la Verificación de Conexión</h2>
+                <h3 class="text-xl font-medium text-gray-700">Lógica</h3>
+                <p class="mt-1">Antes de cada ciclo de monitoreo, el script comprueba si la base de datos está disponible. Si no lo está, espera un tiempo y lo reintenta, evitando errores más adelante.</p>
+            </section>
+
+            <!-- Parte 4: Gestión del IdMuestra -->
+            <section class="bg-white p-6 rounded-lg shadow-lg">
+                <h2 class="text-2xl font-semibold text-gray-800 border-b-2 border-gray-200 pb-3 mb-4">Parte 4: Gestión del IdMuestra</h2>
+                <h3 class="text-xl font-medium text-gray-700">Lógica</h3>
+                <p class="mt-1">Cada conjunto de procesos capturados en un ciclo debe estar asociado a una "Muestra" única en la base de datos. Esta sección obtiene el ID de la última muestra para el equipo actual o crea una nueva si no existe.</p>
+            </section>
+
+            <!-- Parte 5: Recolección de Procesos y Creación del Lote SQL -->
+            <section class="bg-white p-6 rounded-lg shadow-lg">
+                <h2 class="text-2xl font-semibold text-gray-800 border-b-2 border-gray-200 pb-3 mb-4">Parte 5: Recolección de Procesos y Creación del Lote SQL</h2>
+                 <h3 class="text-xl font-medium text-gray-700">Lógica</h3>
+                <p class="mt-1">Usar PowerShell para obtener la lista de procesos, ordenarlos por consumo de memoria y formatearlos como sentencias <code class="inline-code">INSERT</code> de SQL. En lugar de ejecutar una por una, las guarda todas en un archivo temporal para una ejecución masiva y eficiente.</p>
+            </section>
+
+            <!-- Parte 6: Ejecución Masiva, Espera y Repetición -->
+            <section class="bg-white p-6 rounded-lg shadow-lg">
+                <h2 class="text-2xl font-semibold text-gray-800 border-b-2 border-gray-200 pb-3 mb-4">Parte 6: Ejecución Masiva, Espera y Repetición</h2>
+                 <h3 class="text-xl font-medium text-gray-700">Lógica</h3>
+                <p class="mt-1">Ejecutar todas las sentencias <code class="inline-code">INSERT</code> creadas en el paso anterior de una sola vez, esperar el intervalo definido y reiniciar el ciclo.</p>
+            </section>
+
+            <!-- Glosario -->
+            <section class="bg-white p-6 rounded-lg shadow-lg">
+                <h2 class="text-2xl font-semibold text-gray-800 border-b-2 border-gray-200 pb-3 mb-4">Glosario de Comandos y Símbolos</h2>
+                
+                <!-- Comandos de Batch -->
+                <div class="mt-6">
+                    <h3 class="text-xl font-semibold text-blue-700">Comandos de Batch (CMD)</h3>
+                    <ul class="mt-4 space-y-4 text-gray-700">
+                        <li><code class="inline-code">@echo off</code>: Suprime la visualización de los comandos que se están ejecutando para una salida más limpia.</li>
+                        <li><code class="inline-code">setlocal</code>: Inicia un entorno de variables local que se descarta al final del script.</li>
+                        <li><code class="inline-code">if</code>: Evalúa una condición. <code class="inline-code">/i</code> la hace insensible a mayúsculas/minúsculas.</li>
+                        <li><code class="inline-code">start</code>: Inicia un programa en una nueva ventana. <code class="inline-code">/min</code> la inicia minimizada.</li>
+                        <li><code class="inline-code">exit /b</code>: Sale del script actual sin cerrar la ventana de la consola.</li>
+                        <li><code class="inline-code">:ETIQUETA</code>: Define un punto en el script para saltar con <code class="inline-code">goto</code>.</li>
+                        <li><code class="inline-code">REM</code>: Marca una línea como un comentario, que es ignorado por el intérprete.</li>
+                        <li><code class="inline-code">set</code>: Asigna un valor a una variable. <code class="inline-code">set /a</code> realiza operaciones aritméticas.</li>
+                        <li><code class="inline-code">for /f</code>: Un bucle para procesar texto línea por línea desde un comando, archivo o cadena.</li>
+                        <li><code class="inline-code">goto</code>: Transfiere la ejecución a una <code class="inline-code">:ETIQUETA</code>.</li>
+                        <li><code class="inline-code">timeout /t</code>: Pausa la ejecución por un número de segundos.</li>
+                    </ul>
+                </div>
+
+                <!-- Símbolos Especiales -->
+                 <div class="mt-8">
+                    <h3 class="text-xl font-semibold text-green-700">Símbolos Especiales de Batch</h3>
+                    <ul class="mt-4 space-y-4 text-gray-700">
+                        <li><code class="inline-code">%~1</code>, <code class="inline-code">%~f0</code>, <code class="inline-code">%~dp0</code>: Variables especiales que se refieren a los argumentos y a la ruta del propio script.</li>
+                        <li><code class="inline-code">!VARIABLE!</code>: Lee el valor actualizado de una variable dentro de un bucle (expansión retardada).</li>
+                        <li><code class="inline-code">></code>, <code class="inline-code">>></code>, <code class="inline-code"><</code>: Operadores de redirección para enviar salida a archivos o leer entrada desde ellos.</li>
+                        <li><code class="inline-code">|</code>: Tubería (Pipe), envía la salida de un comando como entrada para el siguiente.</li>
+                        <li><code class="inline-code">^</code>: Carácter de escape, para tratar caracteres especiales como texto normal.</li>
+                    </ul>
+                </div>
+
+                <!-- Comandos de PowerShell y MySQL -->
+                <div class="grid md:grid-cols-2 gap-8 mt-8">
+                    <div>
+                        <h3 class="text-xl font-semibold text-purple-700">Comandos de PowerShell</h3>
+                        <ul class="mt-4 space-y-4 text-gray-700">
+                            <li><code class="inline-code">Get-Process</code>: Obtiene la lista de procesos activos.</li>
+                            <li><code class="inline-code">Select-Object</code>: Selecciona propiedades específicas de un objeto.</li>
+                            <li><code class="inline-code">Sort-Object</code>: Ordena una colección de objetos.</li>
+                            <li><code class="inline-code">ForEach-Object</code>: Itera sobre una colección de objetos.</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h3 class="text-xl font-semibold text-orange-700">Comandos de MySQL</h3>
+                        <ul class="mt-4 space-y-4 text-gray-700">
+                            <li><code class="inline-code">-e "COMANDO"</code>: Ejecuta una consulta SQL y sale.</li>
+                            <li><code class="inline-code">--batch</code>, <code class="inline-code">-s</code>, <code class="inline-code">-N</code>: Opciones para controlar el formato de la salida para que sea compatible con scripts.</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <!-- Pie de página -->
+        <footer class="text-center mt-12 py-6 border-t border-gray-200">
+            <p class="text-gray-600">Ing. Jairon Garcia</p>
+        </footer>
+    </div>
+</body>
+</html>
